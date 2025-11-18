@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser'
 const app = express()
 app.use(cors(
   {
-    origin: ['*', 'http://localhost:5173/login', 'https://projectmentor-backend.onrender.com'],
+    origin: ['*', 'http://localhost:5173', 'https://project-mentor-frontend.vercel.app', 'https://projectmentor-backend.onrender.com'],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
   }
