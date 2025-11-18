@@ -1,7 +1,6 @@
 import { ApiResponse } from "../helper/ApiResponse.js";
 import { ApiError } from "../helper/ApiError.js";
 import { Project } from '../models/project-task.model.js'
-import { generateTaskWithAI } from "../helper/generateTask.js";
 import { taskGenerator } from "../helper/taskGenerator.js";
 import {User} from "../models/user.model.js"
 import axios from 'axios'
