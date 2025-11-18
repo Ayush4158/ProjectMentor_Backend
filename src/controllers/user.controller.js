@@ -84,14 +84,14 @@ export const loginUser = async(req,res) => {
     delete loggedInUser.password
     delete loggedInUser.refreshToken
   
-    const options = {
-      httpOnly: true,
-      secure: true
-    }
+    // const options = {
+    //   httpOnly: true,
+    //   secure: true
+    // }
   
     return res.status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken )
+    .cookie("refreshToken", refreshToken)
     .json(
       new ApiResponse(200, loggedInUser,"User Logged in Successfully")
     )
@@ -118,14 +118,14 @@ export const logoutUser = async(req,res) => {
     }
   )
 
-  const options = {
-    httpOnly: true,
-    secure: true
-  }
+  // const options = {
+  //   httpOnly: true,
+  //   secure: true
+  // }
 
   return res.status(200)
-  .clearCookie("accessToken", options)
-  .clearCookie("refreshToken", options)
+  .clearCookie("accessToken" )
+  .clearCookie("refreshToken")
   .json(new ApiResponse(200, "User loggedout successfully"))
 }
 
@@ -153,16 +153,16 @@ export const refreshAccessToken = async(req,res) => {
       throw new ApiError(401, "Refresh token is expired or used")
     }
 
-    const options = {
-      httpOnly: true,
-      secure: true
-    }
+    // const options = {
+    //   httpOnly: true,
+    //   secure: true
+    // }
 
     const {accessToken, newRefreshToken} = await generateAccessRefreshTokens(user._id)
 
     return res.status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", newRefreshToken, options)
+    .cookie("accessToken", accessToken)
+    .cookie("refreshToken", newRefreshToken)
     .json(new ApiResponse(200, "Access Token is generaaed"))
   } catch (error) {
     throw new ApiError(400, error?.message || "Invalid refresh token")
