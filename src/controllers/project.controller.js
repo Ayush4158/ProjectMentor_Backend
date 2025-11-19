@@ -41,7 +41,6 @@ export const createProject = async (req, res) => {
 
 
       const user = await User.findById(req.user._id).select("+githubAccessToken")
-      console.log("github user ",user)
       if(user?.githubAccessToken){
         const [owner, repo] = githubLink.replace("https://github.com/", "").replace('.git', "").split("/")
 

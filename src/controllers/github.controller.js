@@ -43,7 +43,7 @@ export const githubCallback = async (req, res) => {
     }
     
 
-    res.redirect("http://localhost:5173");
+    res.redirect("https://project-mentor-frontend.vercel.app/dashboard");
   } catch (error) {
     console.error("GitHub OAuth failed:", error);
     res.status(500).json({ message: "GitHub connection failed" });
