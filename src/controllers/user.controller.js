@@ -3,7 +3,6 @@ import { ApiError } from "../helper/ApiError.js";
 import { ApiResponse } from "../helper/ApiResponse.js";
 import jwt from "jsonwebtoken";
 
-// ------------------- Generate Tokens -------------------
 const generateAccessRefreshTokens = async (id) => {
   try {
     const newUser = await User.findById(id);
@@ -23,14 +22,13 @@ const generateAccessRefreshTokens = async (id) => {
   }
 };
 
-// Common Cookie Options for deployment (Vercel + Render)
 const cookieOptions = {
   httpOnly: true,
-  secure: true, // required for HTTPS
-  sameSite: "none", // required for cross-site cookies
+  secure: true,
+  sameSite: "none", 
+  maxAge: 10 * 24 * 60 * 60 * 1000,
 };
 
-// ------------------- Register -------------------
 export const registerUser = async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -69,7 +67,7 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// ------------------- Login -------------------
+
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -109,7 +107,6 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// ------------------- Logout -------------------
 export const logoutUser = async (req, res) => {
   await User.findByIdAndUpdate(
     req.userId,
@@ -124,17 +121,14 @@ export const logoutUser = async (req, res) => {
     .json(new ApiResponse(200, "User logged out successfully"));
 };
 
-// ------------------- Get User -------------------
 export const getUser = async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, req.user, "Fetched User Successfully"));
 };
 
-// ------------------- Refresh Token -------------------
 export const refreshAccessToken = async (req, res) => {
-  const incomingToken =
-    req.cookies?.refreshToken || req.body.refreshToken;
+  const incomingToken = req.cookies?.refreshToken || req.body.refreshToken;
 
   if (!incomingToken) {
     throw new ApiError(401, "Unauthorized request");
@@ -146,9 +140,12 @@ export const refreshAccessToken = async (req, res) => {
       process.env.REFRESH_TOKEN_SECRET
     );
 
+    // console.log('dcoded: ', decoded)
+
     const user = await User.findById(decoded._id);
     if (!user) throw new ApiError(401, "Invalid refresh token");
 
+    // console.log(user)
     if (user.refreshToken !== incomingToken) {
       throw new ApiError(401, "Refresh token expired or invalid");
     }
