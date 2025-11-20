@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import {githubCallback, githubWebhook} from "../controllers/github.controller.js"
+import {githubCallback, githubWebhook, githubStatus} from "../controllers/github.controller.js"
 
 const router = Router()
 
@@ -11,5 +11,6 @@ router.route("/auth").get(verifyJWT, (req, res) => {
 });
 router.route("/callback").get(githubCallback);
 router.route("/webhook").post(githubWebhook)
+router.route("/github-status").get(verifyJWT, githubStatus)
 
 export default router

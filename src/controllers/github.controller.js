@@ -2,6 +2,8 @@ import axios from "axios";
 import { User } from "../models/user.model.js";
 import { Project } from "../models/project-task.model.js";
 import { generateAISuggestion } from "../helper/generateAiSuggestion.js";
+import { ApiResponse } from "../helper/ApiResponse.js";
+import { ApiError } from "../helper/ApiError.js";
 
 export const githubCallback = async (req, res) => {
   const code = req.query.code;
@@ -49,72 +51,6 @@ export const githubCallback = async (req, res) => {
     res.status(500).json({ message: "GitHub connection failed" });
   }
 };
-
-// export const githubWebhook = async(req,res) => {
-//   try {
-//     const payload = req.body
-
-//     res.status(200).json({ success: true });
-
-//     const repoUrl = payload.repository?.html_url;
-//     const commit = payload.head_commit;
-//     if(!commit){
-//       return res.status(400).json({
-//         success: false,
-//         message: "No commmit found"
-//       })
-//     }
-//     const commitMessage = commit.message;
-//     const commitUrl = commit.url;
-//     const author = commit.author?.name;
-//     const commitDate = commit.timestamp;
-
-//     const project = await Project.findOne({githubLink: repoUrl})
-//     if(!project){
-//       return res.status(404).json({success: false, message: "Project not found"})
-//     }
-
-//     const commitSha = commit.id
-//     const githubApiUrl = `https://api.github.com/repos/${payload.repository.full_name}/commits/${commitSha}`;
-
-//     const githubResponse = await axios.get(githubApiUrl, {
-//       headerse: {
-//         Accept: "application/vnd.github.v3+json"
-//       }
-//     })
-
-//     const files = githubResponse.data.files || [];
-//     let codeChanges = "";
-//     files.forEach((file) => {
-//       codeChanges += `\nFile: ${file.filename}\nChanges:\n${file.patch || "Binary or large file"}\n`;
-//     });
-
-//     // console.log("messages: ", commitMessage,codeChanges)
-//     const suggestion = await generateAISuggestion(commitMessage, codeChanges )
-//     console.log("suggestion: ", suggestion)
-
-//     project.recentCommits.push({
-//       message: commitMessage,
-//       author,
-//       data: commitDate,
-//       url: commitUrl
-//     })
-
-//     project.aiSuggestions.push({
-//       commitMessage,
-//       suggestion
-//     })
-
-//     project.lastPush = new Date(commitDate)
-//     await project.save();
-
-//      res.status(200).json({ success: true, project, message: "Push processed successfully" });
-
-//   } catch (error) {
-//     console.error("❌ Error processing webhook:", error.message);
-//     res.status(500).json({ success: false, error: error.message });
-//   }
-// }
 
 
 export const githubWebhook = async (req, res) => {
@@ -179,3 +115,36 @@ export const githubWebhook = async (req, res) => {
     }
   });
 };
+
+export const githubStatus = async (req,res) => {
+  try {
+    const userId = req.user._id
+  
+    const user = await User.findById(userId).select("+githubAccessToken")
+  
+    if(!user){
+      throw new ApiError(404, 'User not found')
+    }
+  
+    if(!user.githubAccessToken){
+      return res.status(200).json(
+        new ApiResponse(200, {connected: false}, "User dont have github accesstoken")
+      )
+    }else{
+      return res.status(200).json(
+        new ApiResponse(200, {connected: true}, 'User have github accesstoken')
+      )
+    }
+  } catch (error) {
+     console.error("Login error:", error);
+
+    if (error instanceof ApiError) {
+      return res.status(error.statusCode || 400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    return res.status(500).json(new ApiError(500, "Internal server error"));
+  }
+}
