@@ -131,7 +131,7 @@ export const getUser = async (req, res) => {
 export const refreshAccessToken = async (req, res) => {
   const incomingToken = req.cookies?.refreshToken || req.body.refreshToken;
 
-  console.log('incoming token', incomingToken)
+  // console.log('incoming token', incomingToken)
   if (!incomingToken) {
     throw new ApiError(401, "Unauthorized request");
   }
@@ -142,12 +142,12 @@ export const refreshAccessToken = async (req, res) => {
       process.env.REFRESH_TOKEN_SECRET
     );
 
-    console.log('dcoded: ', decoded)
+    // console.log('dcoded: ', decoded)
 
     const user = await User.findById(decoded._id);
     if (!user) throw new ApiError(401, "Invalid refresh token");
 
-    console.log(user)
+    // console.log(user)
     if (user.refreshToken !== incomingToken) {
       throw new ApiError(401, "Refresh token expired or invalid");
     }
